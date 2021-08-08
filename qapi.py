@@ -13,7 +13,15 @@ class QuranApi(Api):
         and sets the default language.
 
     set_lang()
-        Sets the language for the ayat text
+        Sets the language for the ayat text.
+    is_rtl()
+        Check if the given language is rtl.
+    get_font_details()
+        Gets the font family and font size for the given language.
+    get_db_tbl_name()
+        Gets the name of the db table for the given language.    
+    get_lang_list()
+        Gets the list of all supported languages from database.        
     get_sura_names()
         Fetches list of all sura names from database.
     get_ruku_count()
@@ -35,34 +43,86 @@ class QuranApi(Api):
         :param default_lang: The default language.
         :type default_lang: str.
         """
-
-        # The default language is set to "ur"
-        self.set_lang(default_lang)
+        
         # The parent class constructor is called
         super().__init__(db_path)
+        # The default language is set
+        self.set_lang(default_lang)
 
     def set_lang(self, lang: str) -> None:
         """It sets the language and db table for the ayat text.
 
-        :param lang: A two letter language code.
+        :param lang: The language.
         :type lang: str.
         """
 
         # The language for the ayat text is set
         self.lang = lang
 
-        # If the language is "ur"
-        if lang == "ur":
-            # The db table for ayat text is set
-            self.tbl = "ic_quranic_text-ur"
-        # If the language is "en"
-        elif lang == "en":
-            # The db table for ayat text is set
-            self.tbl = "ic_quranic_text-en"
-        # If the language is "ar"
-        elif lang == "ar":
-            # The db table for ayat text is set
-            self.tbl = "ic_quranic_text-ar"
+        # Returns the name of the db table for the given language
+        self.tbl = self._get_db_tbl_name(lang)        
+
+    def get_lang_list(self) -> list:
+        """Gets the list of all supported languages from database.
+        """
+
+        sql = "SELECT language FROM ic_quranic_tbl_meta_data "
+        sql += "ORDER BY language ASC"
+
+        # The required language list
+        lang_list = []
+        # The language data is fetched
+        rows = self._fetch_data(sql, [], 1)
+        # Each row is added to a list
+        for row in rows:
+                lang_list.append(row[0])
+
+        return lang_list
+
+    def get_font_details(self, lang:str) -> dict:
+        """Gets the font family and font size for the given language.
+        """
+
+        # The sql query
+        sql = "SELECT font_family, font_size FROM ic_quranic_tbl_meta_data"
+        sql += " WHERE language=?"        
+        
+        # The language data is fetched
+        rows = self._fetch_data(sql, [lang], 2)
+        # The font details
+        font_details = {}
+        font_details["family"] = rows[0][0]
+        font_details["size"] = int(rows[0][1])        
+    
+        return font_details
+
+    def is_rtl(self, lang: str) -> bool:
+        """Check if the given language is rtl.
+        """
+
+        # The sql query
+        sql = "SELECT rtl FROM ic_quranic_tbl_meta_data WHERE language=?"        
+        
+        # The language data is fetched
+        rows = self._fetch_data(sql, [lang], 1)
+        # The rtl value
+        rtl = bool(rows[0][0])
+        
+        return rtl
+
+    def _get_db_tbl_name(self, lang: str) -> str:
+        """Gets the name of the db table for the given language.
+        """
+
+        # The sql query
+        sql = "SELECT tbl_name FROM ic_quranic_tbl_meta_data WHERE language=?"        
+        
+        # The language data is fetched
+        rows = self._fetch_data(sql, [lang], 1)
+        # The table name
+        tbl_name = rows[0][0]
+
+        return tbl_name
 
     def get_random_ruku(self) -> dict:
         """It fetches and returns the sura id and sura ruku id of a random ruku.       

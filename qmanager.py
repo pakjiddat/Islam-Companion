@@ -1,7 +1,9 @@
 import sys, os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 from source.qapi import QuranApi
+from source.qconfig import QConfig
 
 class Ui_Manager():
     """This class is used to add quran data to the user interface.
@@ -29,8 +31,11 @@ class Ui_Manager():
         It loads the ruku combo box and the ayat box.
     _get_current_selection()
         It returns the currently selected sura and ruku.
-    _update_layout()
+    _update_icon_path()
         Sets the file path of the random.png icon to an absolute path.
+    _add_languages()
+        Reads the list of languages from database and adds them to the top
+        menu.
     _setFont()
         It sets the font for the ayat text box depending on the current
         language.
@@ -59,19 +64,22 @@ class Ui_Manager():
 
         :param MainWindow: The quran reader window object.
         :type MainWindow: QtWidgets.QMainWindow.
-        """
+        """        
 
+        # The application configuration
+        qconfig       = QConfig()
+        self.config   = qconfig.get_config()    
         # The current language
-        self.lang = "ur"
-        # The absolute path to the database
-        db_path = "/usr/local/share/islamcompanion/quran.db"
+        self.lang = self.config["default_lang"]
         # Creates an instance of the QuranApi class
-        self.api = QuranApi(db_path, self.lang)
+        self.api = QuranApi(self.config["db_path"], self.lang)
         # The main window object is set as obj attribute
         self.MainWindow = MainWindow
 
-        # Updates the layout of the reader
-        self._update_layout()
+        # Updates the path of the random.png icon
+        self._update_icon_path()
+        # Creates a menu for each language in the database
+        self._create_lang_menu()
         # Connects the sura combo box to a call back
         self.MainWindow.suraComboBox.activated.connect(self._sura_selected)
         # Connects the ruku combo box to a call back
@@ -82,15 +90,11 @@ class Ui_Manager():
         self.MainWindow.prevButton.clicked.connect(self._prev_btn_handler)
         # Connects the random button to a call back
         self.MainWindow.randomButton.clicked.connect(self._rand_ruku)
-        # Connects the urdu checkbox menu item to a call back
-        self.MainWindow.actionUrdu.triggered.connect(self._select_lang)
-        # Connects the english checkbox menu item to a call back
-        self.MainWindow.actionEnglish.triggered.connect(self._select_lang)
-        # Connects the arabic checkbox menu item to a call back
-        self.MainWindow.actionArabic.triggered.connect(self._select_lang)
         # Update the language menu so only one item can be selected at a time
         self.MainWindow.langGroup.setExclusive(True)
 
+        # Loads the custom language fonts
+        self._load_font_files()
         # Loads the sura combo box with list of suras
         self._load_sura_list()
         # Loads the ruku combo box with list of rukus
@@ -100,7 +104,62 @@ class Ui_Manager():
         # Displays the ayat text
         self._load_ayat_box()
 
-    def _update_layout(self):
+    def _load_font_files(self) -> None:
+        """Loads custom font files from the fonts folder
+        """
+
+        try:
+            # The font directory
+            font_dir = self.config["font_dir"]
+            # The files in the fonts folder
+            file_list = os.listdir(font_dir)
+            # Each font file in the fonts folder is added to the font database
+            for file in file_list:               
+                # The font file path     
+                file_path = font_dir + "/" + file            
+                # The font is added to the font database
+                id = QtGui.QFontDatabase.addApplicationFont(file_path)
+        except:
+            print("Font files could not be loaded !")
+
+    def _create_lang_menu(self) -> None:
+        """Reads the list of languages from database and adds them to the top
+        menu.
+        """
+
+        # The translate function
+        _translate = QtCore.QCoreApplication.translate
+        # The languages are read from database
+        lang_list = self.api.get_lang_list()        
+        # Each language is added to the menu
+        for lang in lang_list:
+            # A QAction object is created
+            actionLang = QtWidgets.QAction(self.MainWindow.langGroup)            
+            # The object is set as checkable
+            actionLang.setCheckable(True)        
+            # If the language is the default language
+            if self.lang == lang:                
+                # The object is marked as checked
+                actionLang.setChecked(True)
+            else:
+                # The object is marked as not checked
+                actionLang.setChecked(False)
+            # The object name is set
+            actionLang.setObjectName("action" + lang)            
+            # The object text is set
+            actionLang.setText(_translate("MainWindow", lang))
+            # The object stats tip is set
+            actionLang.setStatusTip(
+                _translate("MainWindow", "Change language to " + lang))
+            # The object tool tip is set
+            actionLang.setToolTip(
+                _translate("MainWindow", "Change language to " + lang))
+            # Connects the menu item to a call back
+            actionLang.triggered.connect(self._select_lang)
+            # The object is added to the language menu
+            self.MainWindow.menuLanguage.addAction(actionLang)            
+
+    def _update_icon_path(self) -> None:
         """Sets the file path of the random.png icon to an absolute path.        
         """
         
@@ -108,13 +167,13 @@ class Ui_Manager():
         icon = QtGui.QIcon()
         # The path to the random.png image
         icon.addPixmap(
-            QtGui.QPixmap("/usr/local/share/islamcompanion/random.png"), 
+            QtGui.QPixmap(self.config["random_icon_path"]), 
             QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # The icon is set
         self.MainWindow.randomButton.setIcon(icon)
         
         
-    def _select_lang(self):
+    def _select_lang(self) -> None:
         """Event handler for the language menu items.
 
         It sets the current language to the selected language. It changes the 
@@ -124,37 +183,37 @@ class Ui_Manager():
         # The translate function
         _translate = QtCore.QCoreApplication.translate
 
-        # The status text and shortcut keys are updated
-        self.MainWindow.nextButton.setStatusTip(_translate("MainWindow",
+        # The list of actions
+        actions = self.MainWindow.menuLanguage.actions()
+        # Check if action is checked
+        for action in actions:
+            if action.isChecked():
+                self.lang = action.text()
+                    
+        # Check if the selected language is right to left
+        rtl = self.api.is_rtl(self.lang)            
+        # If the currently selected language is rtl
+        if rtl == 1:
+            # The status text and shortcut keys are updated
+            self.MainWindow.nextButton.setStatusTip(_translate("MainWindow",
                                                            "Next Ruku (Ctrl+N)"))
-        self.MainWindow.nextButton.setShortcut(_translate("MainWindow",
+            self.MainWindow.nextButton.setShortcut(_translate("MainWindow",
                                                           "Ctrl+N"))
-        self.MainWindow.prevButton.setStatusTip(_translate("MainWindow",
+            self.MainWindow.prevButton.setStatusTip(_translate("MainWindow",
                                                            "Previous Ruku (Ctrl+P)"))
-        self.MainWindow.prevButton.setShortcut(_translate("MainWindow",
+            self.MainWindow.prevButton.setShortcut(_translate("MainWindow",
                                                           "Ctrl+P"))
-
-        # If the currently selected language is Urdu
-        if self.MainWindow.actionUrdu.isChecked():
-            # The current language is set
-            self.lang = "ur"
-        # If the currently selected language is English
-        elif self.MainWindow.actionEnglish.isChecked():
-            # The current language is set
-            self.lang = "en"
+        # If the currently selected language is ltr
+        else:
             # The status text and shortcut keys are updated
             self.MainWindow.nextButton.setStatusTip(_translate("MainWindow",
                                                                "Previous Ruku (Ctrl+P)"))
             self.MainWindow.nextButton.setShortcut(_translate("MainWindow",
                                                               "Ctrl+P"))
-            self.MainWindow. prevButton.setStatusTip(_translate("MainWindow",
+            self.MainWindow.prevButton.setStatusTip(_translate("MainWindow",
                                                                 "Next Ruku (Ctrl+N)"))
             self.MainWindow.prevButton.setShortcut(_translate("MainWindow",
                                                               "Ctrl+N"))
-        # If the currently selected language is Arabic
-        elif self.MainWindow.actionArabic.isChecked():
-            # The current language is set
-            self.lang = "ar"
 
         # The current language is set in the api object
         self.api.set_lang(self.lang)
@@ -162,7 +221,7 @@ class Ui_Manager():
         # The ayat box is loaded
         self._load_ayat_box()
 
-    def _next_btn_handler(self):
+    def _next_btn_handler(self) -> None:
         """Even handler for the next button.
 
         If the current language is "en", then it calls the _prev_ruku method.
@@ -177,7 +236,7 @@ class Ui_Manager():
             # The _next_ruku method is called
             self._next_ruku()
 
-    def _prev_btn_handler(self):
+    def _prev_btn_handler(self) -> None:
         """Even handler for the prev button.
 
         If the current language is "en", then it calls the _next_ruku method.
@@ -192,7 +251,7 @@ class Ui_Manager():
             # The _prev_ruku method is called
             self._prev_ruku()
 
-    def _next_ruku(self):
+    def _next_ruku(self) -> None:
         """Loads the next ruku in the ayat box.
 
         It loads the text of next ruku to ayat box.
@@ -230,7 +289,7 @@ class Ui_Manager():
         # The ayat box is loaded
         self._load_ayat_box()
 
-    def _prev_ruku(self):
+    def _prev_ruku(self) -> None:
         """Loads the prev ruku in the ayat box.
 
         It loads the text of previous ruku to ayat box.
@@ -271,7 +330,7 @@ class Ui_Manager():
         # The ayat box is updated
         self._load_ayat_box()
 
-    def _rand_ruku(self):
+    def _rand_ruku(self) -> None:
         """Loads a random ruku in the ayat box.
 
         It loads the text of a random ruku to ayat box.
@@ -291,20 +350,20 @@ class Ui_Manager():
         self._load_ayat_range()
         self._load_ayat_box()
 
-    def _sura_selected(self):
+    def _sura_selected(self) -> None:
         """It loads the ruku combo box and the ayat box
         """
         self._load_ruku_list()
         self._load_ayat_range()
         self._load_ayat_box()
 
-    def _ruku_selected(self):
+    def _ruku_selected(self) -> None:
         """It loads the ruku combo box and the ayat box
         """
         self._load_ayat_range()
         self._load_ayat_box()
 
-    def _get_current_selection(self):
+    def _get_current_selection(self) -> None:
         """It returns the currently selected sura and ruku.
 
         It also returns the start and end ayat numbers. The sura data includes
@@ -357,27 +416,26 @@ class Ui_Manager():
 
         return sel
 
-    def _setFont(self):
+    def _setFont(self) -> None:
         """It sets the font for the ayat text box depending on the current
         language.
         """
 
+        # Check if the selected language is right to left
+        rtl = self.api.is_rtl(self.lang)
+        # Get the font name and size for the selected language
+        font_details = self.api.get_font_details(self.lang)
         # The font object
         font = QtGui.QFont()
-        # If the current language is English
-        if self.lang == "en":
-            font.setFamily("Sans Serif")
-            font.setPointSize(12)
-        else:
-            font.setFamily("Nafees [PYRS]")
-            font.setPointSize(18)
-            font.setWeight(50)
-
-        font.setBold(False)
+        
+        # The font family is set
+        font.setFamily(font_details["family"])
+        # The font size is set
+        font.setPointSize(font_details["size"])        
         # The font is set
         self.MainWindow.ayatText.setFont(font)
 
-    def _get_text_styles(self):
+    def _get_text_styles(self) -> None:
         """It returns the html styles for the ayat text as a dictionary obj.
 
         It returns the style for the outer and inner list tags and the caption
@@ -387,15 +445,18 @@ class Ui_Manager():
         :rtype: dict.
         """
 
+        # Check if the selected language is right to left
+        rtl = self.api.is_rtl(self.lang)            
         # The margin style for the ayat text
         os = "margin-left: 25px;"
         os = os + "list-style-type: none;"
         # The style for the green text
         cs = "color:green;font-size: 12pt;font-weight: bold;"
+        cs += "font-family: Sans Serif"
         # The style for the list elements
         ls = "line-height:50px; padding-bottom: 20px;"
-        # If the language is english
-        if self.lang == "en":
+        # If the language is ltr
+        if not rtl:
             # The style for the green text
             cs = "color:green;font-size: 10pt;font-weight: bold;"
             # The margin style for the ayat text
@@ -408,7 +469,7 @@ class Ui_Manager():
 
         return styles
 
-    def _load_ayat_box(self):
+    def _load_ayat_box(self) -> None:
         """It sets the ayat text
         """
 
@@ -439,7 +500,7 @@ class Ui_Manager():
         # The html list is displayed
         self.MainWindow.ayatText.setHtml(text)
 
-    def _load_ayat_range(self):
+    def _load_ayat_range(self) -> None:
         """It updates the ayat range label.
 
         It sets the start and end ayat values to the label.
@@ -456,7 +517,7 @@ class Ui_Manager():
         # The ayat range text is set
         self.MainWindow.ayatRange.setText(text)
 
-    def _load_ruku_list(self):
+    def _load_ruku_list(self) -> None:
         """It loads the ruku combo box with list of rukus.
 
         It fetches number of rukus in the selected sura. It loads the ruku
@@ -481,7 +542,7 @@ class Ui_Manager():
             # The ruku number is added to the combo box
             self.MainWindow.rukuComboBox.addItem(ruku, ruku)
 
-    def _load_sura_list(self):
+    def _load_sura_list(self) -> None:
         """It loads the sura combo box with list of suras.
 
         It fetches list of sura names from database. It loads the sura combo

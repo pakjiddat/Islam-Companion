@@ -262,9 +262,6 @@
     <property name="title">
      <string>Language</string>
     </property>
-    <addaction name="actionUrdu"/>
-    <addaction name="actionEnglish"/>
-    <addaction name="actionArabic"/>
    </widget>
    <addaction name="menuLanguage"/>
   </widget>

@@ -32,7 +32,7 @@ class HadithApi(Api):
         :type default_lang: str.
         """
 
-        # The default language is set to "ur"
+        # The default language is set
         self.set_lang(default_lang)
         # The parent class constructor is called
         super().__init__(db_path)        
@@ -47,20 +47,20 @@ class HadithApi(Api):
         # The language for the ayat text is set
         self.lang = lang    
         
-        # If the language is "ur"
-        if lang == "ur":
+        # If the language is "Urdu"
+        if lang == "Urdu":
             # The db table for hadith text is set
             self.tbl_text = "ic_hadith_urdu"
             # The db table for hadith books is set
             self.tbl_books = "ic_hadith_books_urdu"
-        # If the language is "en"
-        elif lang == "en":
+        # If the language is "English"
+        elif lang == "English":
             # The db table for hadith text is set
             self.tbl_text = "ic_hadith_english"
             # The db table for hadith books is set
             self.tbl_books = "ic_hadith_books_english"
-        # If the language is "ar"
-        elif lang == "ar":
+        # If the language is "Arabic"
+        elif lang == "Arabic":
             # The db table for hadith text is set
             self.tbl_text = "ic_hadith_arabic"
             # The db table for hadith books is set

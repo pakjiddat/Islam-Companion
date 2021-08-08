@@ -1,10 +1,10 @@
 import sys, os
-
 from random import randint
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from source.hapi import HadithApi
+from source.hconfig import HConfig
 
 class Ui_Manager():
     """
@@ -65,10 +65,13 @@ class Ui_Manager():
         :type MainWindow: QtWidgets.QMainWindow.
         """
         
-        # The absolute path to the database
-        db_path = "/usr/local/share/islamcompanion/hadith.db"
-        # Creates an instance of the Hadith_Api class
-        self.api        = HadithApi(db_path, "ur")
+        # The application configuration
+        hconfig       = HConfig()
+        self.config   = hconfig.get_config()    
+        # The current language
+        self.lang     = self.config["default_lang"]
+        # Creates an instance of the QuranApi class
+        self.api = HadithApi(self.config["db_path"], self.lang)
         # The main window object is set as obj attribute
         self.MainWindow = MainWindow
         
@@ -93,9 +96,6 @@ class Ui_Manager():
         # Update the language menu so only one item can be selected at a time
         self.MainWindow.langGroup.setExclusive(True)
         
-        # The current language
-        self.lang       = "ur"
-     
         # Updates the icon path
         self._update_btn_icon()          
         # Loads the source combo box with list of sources
@@ -107,7 +107,7 @@ class Ui_Manager():
         # Displays the hadith text
         self._load_hadith_box()        
 
-    def _update_btn_icon(self):
+    def _update_btn_icon(self) -> None:
         """Updates the path to the random icon to an absolute path.
         """
         
@@ -115,12 +115,12 @@ class Ui_Manager():
         icon = QtGui.QIcon()
         # The path to the random.png image
         icon.addPixmap(
-            QtGui.QPixmap("/usr/local/share/islamcompanion/random.png"), 
+            QtGui.QPixmap(self.config["random_icon_path"]), 
             QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # The icon is set
         self.MainWindow.randomButton.setIcon(icon)        
         
-    def _update_layout(self):
+    def _update_layout(self) -> None:
         """Updates the layout of the hadith reader so it supports the current
         language.
         
@@ -128,8 +128,8 @@ class Ui_Manager():
         locale and alignment of the combo boxes is also updated.  
         """
 
-        # If the current language is "en"
-        if self.lang == "en":
+        # If the current language is "English"
+        if self.lang == "English":
             # The position of the combo boxes is updated
             self.MainWindow.gridLayout.addWidget(
                 self.MainWindow.bookComboBox, 5, 1, 1, 1)
@@ -173,13 +173,14 @@ class Ui_Manager():
                 
             # The font for the combo boxes is updated
             font = QtGui.QFont()
-            font.setFamily("Sans Serif")
+            font.setFamily("DejaVu Sans")
             font.setPointSize(10)
-            font.setBold(False)
+            font.setBold(True)
             
             self.MainWindow.bookComboBox.setFont(font)
             self.MainWindow.titleComboBox.setFont(font)
             self.MainWindow.sourceComboBox.setFont(font)
+            font.setBold(False)
             font.setPointSize(12)
             self.MainWindow.hadithText.setFont(font)
             
@@ -235,7 +236,7 @@ class Ui_Manager():
             font.setPointSize(18)
             self.MainWindow.hadithText.setFont(font)
             
-    def _select_lang(self):
+    def _select_lang(self) -> None:
         """Event handler for the language menu items.
         
         It sets the current language to the selected language. It changes the 
@@ -257,11 +258,11 @@ class Ui_Manager():
         # If the currently selected language is Urdu
         if self.MainWindow.actionUrdu.isChecked():
             # The current language is set
-            self.lang = "ur"
+            self.lang = "Urdu"
         # If the currently selected language is English
         elif self.MainWindow.actionEnglish.isChecked():
             # The current language is set
-            self.lang = "en"
+            self.lang = "English"
             # The status text and shortcut keys are updated
             self.MainWindow.nextButton.setStatusTip(_translate("MainWindow", 
                 "Previous Hadith (Ctrl+P)"))
@@ -274,7 +275,7 @@ class Ui_Manager():
         # If the currently selected language is Arabic
         elif self.MainWindow.actionArabic.isChecked():
             # The current language is set
-            self.lang = "ar"
+            self.lang = "Arabic"
             
         # The layout is updated for the new language
         self._update_layout()
@@ -291,37 +292,37 @@ class Ui_Manager():
         # Loads the hadith box with text
         self._load_hadith_box()
         
-    def _next_btn_handler(self):
+    def _next_btn_handler(self) -> None:
         """Even handler for the next button.
         
         If the current language is "en", then it calls the _prev_hadith method.
         Otherwise it calls the _next_hadith method.
         """
         
-        # If the current language is "en"
-        if self.lang == "en":
+        # If the current language is "English"
+        if self.lang == "English":
             # The _prev_hadith method is called
             self._prev_hadith()
         else:
             # The _next_hadith method is called
             self._next_hadith()            
             
-    def _prev_btn_handler(self):
+    def _prev_btn_handler(self) -> None:
         """Even handler for the prev button.
         
-        If the current language is "en", then it calls the _next_hadith method.
-        Otherwise it calls the _prev_hadith method.
+        If the current language is "English", then it calls the _next_hadith
+        method. Otherwise it calls the _prev_hadith method.
         """
         
-        # If the current language is "en"
-        if self.lang == "en":
+        # If the current language is "English"
+        if self.lang == "English":
             # The _next_hadith method is called
             self._next_hadith()
         else:
             # The _prev_hadith method is called
             self._prev_hadith()  
                     
-    def _rand_hadith(self):
+    def _rand_hadith(self) -> None:
         """Loads a random hadith in the hadith box.
         
         It loads the text of a random hadith to hadith box.
@@ -356,7 +357,7 @@ class Ui_Manager():
         # The hadith text box is loaded
         self._load_hadith_box()
                             
-    def _next_hadith(self):
+    def _next_hadith(self) -> None:
         """Loads the next hadith.
         
         It loads the text of next hadith to hadith box.
@@ -409,7 +410,7 @@ class Ui_Manager():
         # The hadith box is loaded
         self._load_hadith_box()            
         
-    def _prev_hadith(self):
+    def _prev_hadith(self) -> None:
         """Loads the previous hadith.
         
         It loads the text of previous hadith to hadith box.
@@ -461,7 +462,7 @@ class Ui_Manager():
         # The hadith text box is loaded
         self._load_hadith_box() 
                     
-    def _source_selected(self):
+    def _source_selected(self) -> None:
         """It loads the book and title combo boxes and also the hadith box.
         """
         
@@ -472,7 +473,7 @@ class Ui_Manager():
         # The hadith text box is loaded
         self._load_hadith_box()   
         
-    def _book_selected(self):
+    def _book_selected(self) -> None:
         """It loads the title combo box and the hadith box.
         """
 
@@ -481,7 +482,7 @@ class Ui_Manager():
         # The hadith text box is loaded
         self._load_hadith_box()
         
-    def _get_current_selection(self):
+    def _get_current_selection(self) -> None:
         """It returns the currently selected source, book and title.
         
         Returns
@@ -530,7 +531,7 @@ class Ui_Manager():
         
         return selection
 
-    def _load_hadith_box(self):
+    def _load_hadith_box(self) -> None:
         """It updates the hadith box with the current hadith.
         """
         
@@ -549,7 +550,7 @@ class Ui_Manager():
         # The hadith text html is set
         self.MainWindow.hadithText.setHtml(text)
                 
-    def _load_source_list(self):
+    def _load_source_list(self) -> None:
         """It loads the source combo box with list of sources.
         
         It fetches list of source names from database.
@@ -570,7 +571,7 @@ class Ui_Manager():
             # The loop counter is increased by 1
             count += 1
             
-    def _load_book_list(self):
+    def _load_book_list(self) -> None:
         """It loads the book combo box with list of books.
         
         It fetches list of book names from database.
@@ -591,7 +592,7 @@ class Ui_Manager():
             # The book is added to the book combo box
             self.MainWindow.bookComboBox.addItem(book[1], str(book[0]))
             
-    def _load_title_list(self):
+    def _load_title_list(self) -> None:
         """It loads the title combo box with list of titles for the selected
         hadith source and book.
         """

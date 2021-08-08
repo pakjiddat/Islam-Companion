@@ -1,19 +1,20 @@
 import os, unittest
-from hapi import HadithApi
+from source.hapi import HadithApi
+from source.hconfig import HConfig
 
 class TestHadithApi(unittest.TestCase):
     """Used to test the HadithApi class.
     """
 
-    def test_hadith_api(self):
+    def test_hadith_api(self) -> None:
         """Used to test all the methods of the HadithApi class
         """
 
-        # The absolute path to the database
-        cur_dir = os.path.dirname(os.path.realpath(__file__))
-        db_path = os.path.abspath(cur_dir + "/../data/hadith.db")
-        # An instance of the HadithApi class is created
-        hapi = HadithApi(db_path, "ur")
+        # The application configuration
+        hconfig  = HConfig()
+        config   = hconfig.get_config()    
+        # An instance of the QuranApi class is created
+        hapi = HadithApi(config["db_path"], config["default_lang"])
 
         # The get_source_list method is tested 
         source_list = hapi.get_source_list()

@@ -37,7 +37,7 @@ class Api():
             # The error is shown in message box
             self._display_error("")
 
-    def _display_error(self, last_query: str):
+    def _display_error(self, last_query: str) -> None:
         """Error handling method.
 
         It displays the given error message in a message box and ends the

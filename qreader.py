@@ -149,9 +149,6 @@ class Ui_MainWindow(object):
         self.actionArabic = QtWidgets.QAction(self.langGroup)
         self.actionArabic.setCheckable(True)
         self.actionArabic.setObjectName("actionArabic")
-        self.menuLanguage.addAction(self.actionUrdu)
-        self.menuLanguage.addAction(self.actionEnglish)
-        self.menuLanguage.addAction(self.actionArabic)
         self.menuBar.addAction(self.menuLanguage.menuAction())
 
         self.retranslateUi(MainWindow)
