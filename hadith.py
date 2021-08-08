@@ -16,8 +16,8 @@ Finally the script runs the applications by calling the exec_ method
 """
 
 import sys
-from hreader import Ui_MainWindow
-from hmanager import Ui_Manager
+from source.hreader import Ui_MainWindow
+from source.hmanager import Ui_Manager
 from PyQt5 import QtWidgets
 
 if __name__ == "__main__":    

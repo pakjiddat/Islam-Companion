@@ -3,9 +3,8 @@ import sys, os
 from random import randint
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from qapi import QuranApi
 
-from hapi import HadithApi
+from source.hapi import HadithApi
 
 class Ui_Manager():
     """
@@ -16,6 +15,8 @@ class Ui_Manager():
     initialize_ui()
         Loads the source, book and title combo boxes and the hadith text.
     
+     _update_btn_icon()
+        Updates the path to the random icon to an absolute path.       
     _update_layout()
         Updates the layout of the hadith reader so it supports the current
         language.
@@ -65,8 +66,7 @@ class Ui_Manager():
         """
         
         # The absolute path to the database
-        cur_dir         = os.path.dirname(os.path.realpath(__file__))
-        db_path         = os.path.abspath(cur_dir + "/data/hadith.db")
+        db_path = "/usr/local/share/islamcompanion/hadith.db"
         # Creates an instance of the Hadith_Api class
         self.api        = HadithApi(db_path, "ur")
         # The main window object is set as obj attribute
@@ -95,7 +95,9 @@ class Ui_Manager():
         
         # The current language
         self.lang       = "ur"
-               
+     
+        # Updates the icon path
+        self._update_btn_icon()          
         # Loads the source combo box with list of sources
         self._load_source_list()
         # Loads the book combo box with list of books
@@ -105,14 +107,27 @@ class Ui_Manager():
         # Displays the hadith text
         self._load_hadith_box()        
 
+    def _update_btn_icon(self):
+        """Updates the path to the random icon to an absolute path.
+        """
+        
+        # An icon is created
+        icon = QtGui.QIcon()
+        # The path to the random.png image
+        icon.addPixmap(
+            QtGui.QPixmap("/usr/local/share/islamcompanion/random.png"), 
+            QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # The icon is set
+        self.MainWindow.randomButton.setIcon(icon)        
+        
     def _update_layout(self):
         """Updates the layout of the hadith reader so it supports the current
         language.
         
         The position of the combo boxes, labels and buttons is updated. The
-        locale and alignment of the combo boxes is also updated.
+        locale and alignment of the combo boxes is also updated.  
         """
-        
+
         # If the current language is "en"
         if self.lang == "en":
             # The position of the combo boxes is updated

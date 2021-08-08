@@ -25,13 +25,15 @@ class Api():
         :param db_path: The absolute path to the database.
         :type db_path: str.
         """        
-
+        
         # The database name and connection options are set
         self.con = QSqlDatabase.addDatabase("QSQLITE")
         self.con.setDatabaseName(db_path)
         self.con.setConnectOptions("QSQLITE_OPEN_READONLY=1")
         # Try to open the connection and handle possible errors
         if not self.con.open():
+            # The db path is printed
+            print(db_path)
             # The error is shown in message box
             self._display_error("")
 
@@ -52,11 +54,11 @@ class Api():
         if last_query != "":
             msg += " Last query: " + last_query
 
-        """ QMessageBox.critical(
+        QMessageBox.critical(
             None,
             "Quran Reader - Error!",
-            "Database Error: " + msg,
-        ) """
+            msg,
+        )
 
         # The error message is printed to console
         print(msg)

@@ -75,7 +75,7 @@ class Ui_MainWindow(object):
         self.randomButton.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.randomButton.setLocale(QtCore.QLocale(QtCore.QLocale.Urdu, QtCore.QLocale.Pakistan))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("data/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../../../../../usr/local/share/islamcompanion/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.randomButton.setIcon(icon)
         self.randomButton.setArrowType(QtCore.Qt.NoArrow)
         self.randomButton.setObjectName("randomButton")

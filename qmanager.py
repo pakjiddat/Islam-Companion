@@ -1,7 +1,7 @@
 import sys, os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from qapi import QuranApi
+from source.qapi import QuranApi
 
 class Ui_Manager():
     """This class is used to add quran data to the user interface.
@@ -29,6 +29,8 @@ class Ui_Manager():
         It loads the ruku combo box and the ayat box.
     _get_current_selection()
         It returns the currently selected sura and ruku.
+    _update_layout()
+        Sets the file path of the random.png icon to an absolute path.
     _setFont()
         It sets the font for the ayat text box depending on the current
         language.
@@ -62,13 +64,14 @@ class Ui_Manager():
         # The current language
         self.lang = "ur"
         # The absolute path to the database
-        cur_dir = os.path.dirname(os.path.realpath(__file__))
-        db_path = os.path.abspath(cur_dir + "/data/quran.db")
-        # Creates an instance of the Quran_Api class
+        db_path = "/usr/local/share/islamcompanion/quran.db"
+        # Creates an instance of the QuranApi class
         self.api = QuranApi(db_path, self.lang)
         # The main window object is set as obj attribute
         self.MainWindow = MainWindow
 
+        # Updates the layout of the reader
+        self._update_layout()
         # Connects the sura combo box to a call back
         self.MainWindow.suraComboBox.activated.connect(self._sura_selected)
         # Connects the ruku combo box to a call back
@@ -97,6 +100,20 @@ class Ui_Manager():
         # Displays the ayat text
         self._load_ayat_box()
 
+    def _update_layout(self):
+        """Sets the file path of the random.png icon to an absolute path.        
+        """
+        
+        # An icon is created
+        icon = QtGui.QIcon()
+        # The path to the random.png image
+        icon.addPixmap(
+            QtGui.QPixmap("/usr/local/share/islamcompanion/random.png"), 
+            QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # The icon is set
+        self.MainWindow.randomButton.setIcon(icon)
+        
+        
     def _select_lang(self):
         """Event handler for the language menu items.
 
@@ -322,7 +339,8 @@ class Ui_Manager():
             ruku = 1
 
         # The ayat range data is parsed
-        text = self.MainWindow.ayatRange.text().split(" - ")
+        text = self.MainWindow.ayatRange.text()
+        text = text.replace("Ayas ", "").split(" - ")
         # The start ayat number
         start = int(text[0])
         # The end ayat number
@@ -434,6 +452,7 @@ class Ui_Manager():
         ayat_data = self.api.get_ayat_range(sel["sura"], sel["ruku"])
         # The ayat range text
         text = str(ayat_data["start"]) + " - " + str(ayat_data["end"])
+        text = "Ayas " + text
         # The ayat range text is set
         self.MainWindow.ayatRange.setText(text)
 

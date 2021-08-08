@@ -16,8 +16,8 @@ Finally the script runs the applications by calling the exec_ method.
 
 import sys,os
 
-from qreader import Ui_MainWindow
-from qmanager import Ui_Manager
+from source.qreader import Ui_MainWindow
+from source.qmanager import Ui_Manager
 from PyQt5 import QtWidgets
 
 if __name__ == "__main__":    

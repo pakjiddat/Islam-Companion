@@ -1,6 +1,6 @@
 import os, sys
 
-from api import Api
+from source.api import Api
 
 class QuranApi(Api):
     """
