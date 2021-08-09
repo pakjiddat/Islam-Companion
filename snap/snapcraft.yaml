@@ -1,0 +1,122 @@
+name: islamcompanion # you probably want to 'snapcraft register <name>'
+base: core20 # the base snap is the execution environment for this snap
+version: '1.2.0' # just for humans, typically '1.2+git' or '1.3.2'
+summary: Allows users to read Quran and Hadith text # 79 char long summary
+description: |
+  Islam Companion allows users to read Quran and Hadith. It provides two
+  applications. A Hadith reader and a Quran reader.
+
+  The Quran text can be read in following languages: **Amharic, Arabic, 
+  Azerbaijani,Bosnian, Bengali, Bulgarian, Amazigh, Czech, German, Divehi,
+  Spanish, English, Persian, French, Hindi, Hausa, Indonesian, Italian,
+  Japanese, Korean, Kurdish, Malayalam, Malay, Dutch, Norwegian, Portuguese,
+  Polish, Russian, Romanian, Swedish, Somali, Sindhi, Albanian, Swahili, 
+  Turkish, Tajik, Tamil, Tatar, Thai, Uzbek, Urdu, Uyghur and Chinese.**
+  
+  Hadith text can be read in Urdu, English and Arabic languages.
+
+  To report bugs or make feature requests, post an issue on: 
+  https://github.com/pakjiddat/islam-companion-desktop-reader/issues.
+  Constructive feedback is most welcome !.
+
+  Resources:
+
+  * Translations of the Quran were obtained from: https://tanzil.net/trans/
+  * Translations of the Hadith were obtained from: http://www.hadithcollection.com/downloads.html
+  * Icons were obtained from: https://www.iconfinder.com/
+  * Banner image was obtained from: https://pixabay.com/
+  * Language fonts were obtained from:
+    * Persian and Uyghur: https://fontlibrary.org/en/font/xb-shafigh
+    * Sindhi: https://fonts2u.com/zaheer-sindhi.font
+    * Amharic: https://www.metaappz.com/References/Amharic_Fonts.aspx
+    * Divehi: https://www.fontspace.com/mv-dawlatulislam-font-f22932
+    * Kurdish: https://www.kurdfonts.com/font-info/609
+  * The quran and hadith readers were developed using the PyQt5 framework.
+    The applications were developed in Python language and use Sqlite3 for the 
+    database.
+
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+
+layout:
+  /usr/local/share/islamcompanion/quran.db:
+    bind-file: $SNAP/usr/local/share/islamcompanion/quran.db
+  /usr/local/share/islamcompanion/hadith.db:
+    bind-file: $SNAP/usr/local/share/islamcompanion/hadith.db
+  /usr/local/share/islamcompanion/random.png:
+    bind-file: $SNAP/usr/local/share/islamcompanion/random.png
+  /usr/local/share/islamcompanion/fonts/Chiret-Regular.ttf:
+    bind-file: $SNAP/usr/local/share/islamcompanion/fonts/Chiret-Regular.ttf
+  /usr/local/share/islamcompanion/fonts/Mvdawlatulislam-Z8dJ.ttf:
+    bind-file: $SNAP/usr/local/share/islamcompanion/fonts/Mvdawlatulislam-Z8dJ.ttf
+  /usr/local/share/islamcompanion/fonts/NizarNastaliqKurdish.ttf:
+    bind-file: $SNAP/usr/local/share/islamcompanion/fonts/NizarNastaliqKurdish.ttf
+  /usr/local/share/islamcompanion/fonts/XB_Shafigh.ttf:
+    bind-file: $SNAP/usr/local/share/islamcompanion/fonts/XB_Shafigh.ttf  
+  /usr/local/share/islamcompanion/fonts/Zaheer_Sindhi.ttf:
+    bind-file: $SNAP/usr/local/share/islamcompanion/fonts/Zaheer_Sindhi.ttf
+parts:
+  # The application files      
+  app-files:
+    plugin: dump
+    source: ./deploy/dist    
+    filesets:
+       data-files:
+         - usr/local/share/islamcompanion/quran.db
+         - usr/local/share/islamcompanion/hadith.db
+       font-files:
+         - usr/local/share/islamcompanion/fonts/Chiret-Regular.ttf
+         - usr/local/share/islamcompanion/fonts/Mvdawlatulislam-Z8dJ.ttf
+         - usr/local/share/islamcompanion/fonts/NizarNastaliqKurdish.ttf
+         - usr/local/share/islamcompanion/fonts/XB_Shafigh.ttf
+         - usr/local/share/islamcompanion/fonts/Zaheer_Sindhi.ttf
+
+       binaries: ["bin/hadith-reader", "bin/quran-reader"]
+       desktop-files:
+         - usr/share/applications/quran.desktop
+         - usr/share/applications/hadith.desktop
+       icons:
+         - usr/share/applications/quran.svg
+         - usr/share/applications/hadith.svg
+         - usr/local/share/islamcompanion/random.png
+    stage:
+      - $data-files
+      - $font-files
+      - $binaries
+      - $desktop-files
+      - $icons
+    prime:
+      - $data-files
+      - $font-files
+      - $binaries
+      - $desktop-files
+      - $icons
+    organize:        
+      "data/fonts/*.ttf": "usr/local/share/islamcompanion/fonts/"  
+      "data/*.db": "usr/local/share/islamcompanion/"  
+      "data/random.png": "usr/local/share/islamcompanion/"        
+      "data/*.desktop": "usr/share/applications/"
+      "data/*.svg": "usr/share/applications/"
+    
+apps:    
+  quran-reader:    
+    extensions:
+      - kde-neon
+    command: bin/quran-reader
+    plugs:
+    - desktop
+    - desktop-legacy
+    - wayland
+    - unity7
+    desktop: usr/share/applications/quran.desktop
+    
+  hadith-reader:    
+    extensions:
+      - kde-neon
+    command: bin/hadith-reader
+    plugs:
+    - desktop
+    - desktop-legacy
+    - wayland
+    - unity7
+    desktop: usr/share/applications/hadith.desktop

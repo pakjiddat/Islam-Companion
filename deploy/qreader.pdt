@@ -1,0 +1,197 @@
+version = 0
+sysroot = "sysroot.toml"
+sysroots_dir = ""
+parts = [ "Python:sysconfig", "Python:zlib", "Python:importlib.resources", "PyQt:PyQt5.QtWidgets", "PyQt:PyQt5.QtX11Extras", "PyQt:PyQt5.QtSql",]
+
+[Application]
+entry_point = ""
+is_console = false
+is_bundle = false
+name = "quran-reader"
+qmake_configuration = ""
+script = "/home/nadir/Projects/islam-companion/source/quran.py"
+syspath = ""
+
+[Application.Package]
+name = "/home/nadir/Projects/islam-companion/source"
+exclude = [ "*.pyc", "*.pyd", "*.pyo", "*.pyx", "*.pxi", "__pycache__", "*-info", "EGG_INFO",]
+[[Application.Package.Content]]
+name = "__init__.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "api.py"
+included = true
+is_directory = false
+
+[[Application.Package.Content]]
+name = "CHANGELOG.md"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "data"
+included = false
+is_directory = true
+[[Application.Package.Content.Content]]
+name = "fonts"
+included = false
+is_directory = true
+[[Application.Package.Content.Content.Content]]
+name = "Chiret-Regular.ttf"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content.Content]]
+name = "Mvdawlatulislam-Z8dJ.ttf"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content.Content]]
+name = "NizarNastaliqKurdish.ttf"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content.Content]]
+name = "XB_Shafigh.ttf"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content.Content]]
+name = "Zaheer_Sindhi.ttf"
+included = false
+is_directory = false
+
+
+[[Application.Package.Content.Content]]
+name = "hadith.db"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "hadith.desktop"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "hadith.svg"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "islamcompanion.db"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "quran.db"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "quran.desktop"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "quran.svg"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "random.png"
+included = false
+is_directory = false
+
+
+[[Application.Package.Content]]
+name = "hadith.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "hapi.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "hconfig.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "hmanager.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "hreader.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "hreader.ui"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "LICENSE"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "qapi.py"
+included = true
+is_directory = false
+
+[[Application.Package.Content]]
+name = "qconfig.py"
+included = true
+is_directory = false
+
+[[Application.Package.Content]]
+name = "qmanager.py"
+included = true
+is_directory = false
+
+[[Application.Package.Content]]
+name = "qreader.py"
+included = true
+is_directory = false
+
+[[Application.Package.Content]]
+name = "qreader.ui"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "quran.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "README.md"
+included = false
+is_directory = false
+
+[[Application.Package.Content]]
+name = "test"
+included = false
+is_directory = true
+[[Application.Package.Content.Content]]
+name = "__init__.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "test_hapi.py"
+included = false
+is_directory = false
+
+[[Application.Package.Content.Content]]
+name = "test_qapi.py"
+included = false
+is_directory = false
+
+

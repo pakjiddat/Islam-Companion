@@ -1,0 +1,34 @@
+# The sysroot for the demo application.
+
+# Python ######################################################################
+
+[Python]
+version = "3.6.14"
+dynamic_loading = true
+install_from_source = true
+
+# PyQt ########################################################################
+
+[PyQt]
+version = "5.15.4"
+installed_modules = ["QtCore", "QtGui", "QtWidgets", "QtX11Extras", "QtSql"]
+
+[PyQt.linux]
+installed_modules = ["QtCore", "QtGui", "QtWidgets", "QtX11Extras", "QtSql"]
+
+[Qt]
+version = "5.15.2"
+edition = "opensource"
+configure_options = ["-opengl", "desktop", "-no-dbus", "-qt-pcre"]
+skip = ["qtactiveqt", "qtconnectivity", "qtdoc", "qtgamepad", "qtlocation",
+        "qtmultimedia", "qtnetworkauth", "qtquickcontrols", "qtquickcontrols2",
+        "qtremoteobjects", "qtscript", "qtscxml", "qtsensors", "qtserialbus",
+        "qtserialport", "qtspeech", "qtsvg", "qttools", "qttranslations",
+        "qtwebchannel", "qtwebengine", "qtwebsockets", "qtwebview", 
+        "qtxmlpatterns"]
+
+# SIP #########################################################################
+
+[SIP]
+version = "12.9.0"
+module_name = "PyQt5.sip"

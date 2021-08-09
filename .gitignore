@@ -1,4 +1,11 @@
-data/
-__pycache__/
-test/__pycache__/
+source/data/
+source/__pycache__/
+source/test/__pycache__/
+source/bin/
 bin/
+lib/
+sysroot-linux-64/
+deploy/build-linux-64/
+deploy/sysroot-linux-64/
+deploy/dist/
+pyvenv.cfg
