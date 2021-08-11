@@ -1,10 +1,10 @@
-![Islam Companion Desktop Reader](https://pakjiddat.netlify.app/static/8c513780478d833c9b633dcd099b6348/f941f/islamcompanion-desktop-reader.png)
+![Islam Companion](https://pakjiddat.netlify.app/static/b7da167c6d12debdc92aff487e784039/f8915/islamcompanion.png)
 
 [![islamcompanion](https://snapcraft.io/islamcompanion/badge.svg)](https://snapcraft.io/islamcompanion)
 
 ### Introduction
 
-The **Islam Companion Desktop Reader** project is a desktop application. It is availabe as a snap application on [Ubuntu Store](https://snapcraft.io/islamcompanion). It allows users to read Holy Quran and Hadith. It provides two applications. A Hadith reader and a Quran reader.
+The **Islam Companion** project is a desktop application. It is available as a snap application on [Ubuntu Store](https://snapcraft.io/islamcompanion). It allows users to read Holy Quran and Hadith. It provides two applications. A Hadith reader and a Quran reader.
 
 ### Features
 
@@ -14,13 +14,13 @@ Hadith text can be read in Urdu, English and Arabic languages.
 
 ### Limitations
 
-The Islam Companion Desktop Reader has the following limitations:
+The Islam Companion has the following limitations:
 
 * The text for some languages may be difficult to read because of font size.
 * The hadith text in English language is a rough translation and may contain grammatical errors.
 
 ### Installation
-The Islam Companion Desktop Reader application may be downloaded from the Ubuntu Snap Store.
+The Islam Companion application may be downloaded from the Ubuntu Snap Store.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/islamcompanion)
 
@@ -30,7 +30,7 @@ The following steps are required to run the Islam Companion Desktop application 
 
 * Create a Python virtual environment based on Python version **3.6.14** using the command: `python3 -m virtualenv islam-companion -p /usr/bin/python3.6`
 * Change directory to the new virtual environment and activate the environment using the command: `source bin/activate`.
-* Clone the git repository using the command: `git clone https://github.com/pakjiddat/islam-companion-desktop-reader.git`. Move the contents of the cloned directory to the root of the virtual environment. The root directory should contain the folders: **deploy, snap and source**.
+* Clone the git repository using the command: `git clone https://github.com/pakjiddat/islam-companion.git`. Move the contents of the cloned directory to the root of the virtual environment. The root directory should contain the folders: **deploy, snap and source**.
 * Next install the required Python packages using the command: `pip install requirements.txt`.
 * Click [here](https://drive.google.com/file/d/1TdD4jsCmqvN4y1gGR4IeVR1JGOdj_56n/view?usp=sharing) to download the data for the quran and hadith readers. Rename the downloaded folder to data and move it to the **source/** folder.
 * Run the quran reader application using the command: `python -m source.quran`. The command should be run from the root folder of the virtual environment. The hadith reader can be run using the command: `python -m source.hadith`.
@@ -66,7 +66,7 @@ To generate executable files for the quran and hadith readers, we need to follow
 
 In order to run the executable files we need to download the [data files](https://drive.google.com/file/d/1TdD4jsCmqvN4y1gGR4IeVR1JGOdj_56n/view?usp=sharing) to the **/usr/local/share/islamcompanion** folder. This folder should contain a fonts sub folder and the quran and hadith sqlite database files. It also contains an icon file and desktop launcher files.
 
-It should now be possible to run the quran and hadith desktop reader applications.
+It should now be possible to run the quran and hadith applications.
 
 ### Deploying the executable files to Ubuntu Snap Store
 
@@ -86,7 +86,7 @@ Once the snap file has been created, it can be installed on the local computer o
 
 ### Acknowledgements
 
-The purpose of the Islam Companion Desktop Reader project is to allow users to read the Holy Quran and Hadith text in their own language.
+The purpose of the Islam Companion project is to allow users to read the Holy Quran and Hadith text in their own language.
 
 The following resources were used in the development of the project:
 
@@ -102,8 +102,8 @@ The following resources were used in the development of the project:
   * Kurdish: https://www.kurdfonts.com/font-info/609
 * The quran and hadith readers were developed using the PyQt5 framework. The applications were developed in Python language and use Sqlite3 for the database.
 
-To report bugs or make feature requests, post an [issue](https://github.com/pakjiddat/islam-companion-desktop-reader/issues). Constructive feedback is most welcome !.
+To report bugs or make feature requests, post an [issue](https://github.com/pakjiddat/islam-companion/issues). Constructive feedback is most welcome !.
 
 ### Licence 
 
-The Islam Companion Desktop Reader project is available under the **MIT licence**. You may use the application source code in your own projects.
+The Islam Companion project is available under the **MIT licence**. You may use the application source code in your own projects.
