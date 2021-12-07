@@ -29,9 +29,13 @@ class QuranApi(Api):
     get_ayat_range()
         Fetches the start and end ayat for the given sura and ruku.
     get_ayat_text()
-        Fetches the ayat text for the given sura and ruku
+        Fetches the ayat text for the given sura and ruku.,
     get_random_ruku()
-        Fetches details for a randomly choosen ruku
+        Fetches details for a randomly choosen ruku.
+    update_settings()
+        Updates the current settings in database.
+    get_row()
+        Gets the field values for the given row
     """
 
     def __init__(self, db_path: str, default_lang: str) -> None:
@@ -79,8 +83,34 @@ class QuranApi(Api):
 
         return lang_list
 
+    def update_settings(self, lang: str, sura:int, ayat_id:int) -> None:
+        """Updates the current settings in database.
+        
+        :param lang: The current language.
+        :type lang: string
+        :param sura: The current sura.
+        :type sura: int
+        :param ayat_id: The start ayat id.
+        :type ayat_id: int
+        """
+
+        # The sql query
+        sql = "SELECT id FROM `" + self.tbl + "` WHERE sura=? AND "
+        sql += "sura_ayat_id=?"
+        
+        # The language data is fetched
+        rows = self._fetch_data(sql, [sura, ayat_id], 1)
+        
+        # The bind values for the query
+        bind_values = [lang, rows[0][0]]
+        sql = "UPDATE ic_quranic_settings SET language=?, row_id=?"
+        self._update_data(sql, bind_values)
+        
     def get_font_details(self, lang:str) -> dict:
         """Gets the font family and font size for the given language.
+
+        :param lang: The language.
+        :type lang: string.        
         """
 
         # The sql query
@@ -98,6 +128,9 @@ class QuranApi(Api):
 
     def is_rtl(self, lang: str) -> bool:
         """Check if the given language is rtl.
+        
+        :param lang: The language.
+        :type lang: string.        
         """
 
         # The sql query
@@ -112,6 +145,9 @@ class QuranApi(Api):
 
     def _get_db_tbl_name(self, lang: str) -> str:
         """Gets the name of the db table for the given language.
+                
+        :param lang: The language.
+        :type lang: string.        
         """
 
         # The sql query
@@ -251,3 +287,24 @@ class QuranApi(Api):
         ayat_data['end'] = rows[0][0]
 
         return ayat_data
+
+    def get_row(self, row_id: int) -> list:
+        """It returns the field values for the given row.
+
+        :param row_id: The row id.
+        :type row_id: int.                    
+        :return: The field values for the given row.
+        :rtype: dict.    
+        """
+
+        # The bind values for the sql query
+        args = [row_id]
+
+        # The sql query
+        sql = "SELECT sura, sura_ruku FROM `ic_quranic_meta_data`"
+        sql += " WHERE id=?"        
+
+        # The required data is fetched
+        rows = self._fetch_data(sql, args, 2)
+  
+        return rows

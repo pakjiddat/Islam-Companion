@@ -29,7 +29,7 @@ class Api():
         # The database name and connection options are set
         self.con = QSqlDatabase.addDatabase("QSQLITE")
         self.con.setDatabaseName(db_path)
-        self.con.setConnectOptions("QSQLITE_OPEN_READONLY=1")
+        # self.con.setConnectOptions("QSQLITE_OPEN_READONLY=0")
         # Try to open the connection and handle possible errors
         if not self.con.open():
             # The db path is printed
@@ -127,3 +127,44 @@ class Api():
         #self.con.close()
         # The data is returned
         return rows        
+        
+    def _update_data(self, sql: str, bind_values: list) -> None:
+        """It runs the given sql update query
+
+        The sql query placeholder should be "?". The values in the bind_values
+        parameter will replace "?".
+
+        :param sql: The sql query to run.
+        :type sql: str.        
+        :param bind_values: The values to bind to the query placeholders.
+        :type bind_values: list.
+        """
+
+        # Try to open the connection and handle possible errors
+        if not self.con.open():
+            # The error is shown in message box
+            self._display_error("")
+            
+        # The query object is created
+        query = QSqlQuery()
+
+        # If the sql query contains placeholders
+        if len(bind_values) > 0:
+            # Prepared query is used
+            query.prepare(sql)
+            # Each given bind value is added
+            for val in bind_values:            
+                # The bind value is added
+                query.addBindValue(val)
+            # The query is run
+            if not query.exec():
+                self._display_error(sql)
+        else:
+            # The query is run
+            if not query.exec(sql):
+                self._display_error(sql)       
+                
+        # The resources associated with the query object are freed
+        query.finish()
+        # The connection is closed
+        #self.con.close()     

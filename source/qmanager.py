@@ -49,6 +49,10 @@ class Ui_Manager():
         It loads the ruku combo box with list of rukus.
     _load_sura_list()
         It loads the sura combo box with list of suras.
+    _update_settings()
+        It saves the current settings to database.
+    _load_settings()
+        It loads the current settings from database.    
     """
 
     def initialize_ui(self, MainWindow: QtWidgets.QMainWindow) -> None:
@@ -73,6 +77,8 @@ class Ui_Manager():
         self.lang = self.config["default_lang"]
         # Creates an instance of the QuranApi class
         self.api = QuranApi(self.config["db_path"], self.lang)
+        # Loads settings from database
+        self._load_settings()
         # The main window object is set as obj attribute
         self.MainWindow = MainWindow
 
@@ -102,7 +108,7 @@ class Ui_Manager():
         # Sets the start and end ayat numbers
         self._load_ayat_range()
         # Displays the ayat text
-        self._load_ayat_box()
+        self._load_ayat_box()        
 
     def _load_font_files(self) -> None:
         """Loads custom font files from the fonts folder
@@ -157,7 +163,7 @@ class Ui_Manager():
             # Connects the menu item to a call back
             actionLang.triggered.connect(self._select_lang)
             # The object is added to the language menu
-            self.MainWindow.menuLanguage.addAction(actionLang)            
+            self.MainWindow.menuLanguage.addAction(actionLang)
 
     def _update_icon_path(self) -> None:
         """Sets the file path of the random.png icon to an absolute path.        
@@ -220,6 +226,8 @@ class Ui_Manager():
 
         # The ayat box is loaded
         self._load_ayat_box()
+        # The settings are updated in database
+        self._update_settings()
 
     def _next_btn_handler(self) -> None:
         """Even handler for the next button.
@@ -235,6 +243,8 @@ class Ui_Manager():
         else:
             # The _next_ruku method is called
             self._next_ruku()
+        # The settings are updated in database
+        self._update_settings()
 
     def _prev_btn_handler(self) -> None:
         """Even handler for the prev button.
@@ -250,6 +260,9 @@ class Ui_Manager():
         else:
             # The _prev_ruku method is called
             self._prev_ruku()
+
+        # The settings are updated in database
+        self._update_settings()
 
     def _next_ruku(self) -> None:
         """Loads the next ruku in the ayat box.
@@ -349,25 +362,61 @@ class Ui_Manager():
             ruku_details["sura_ruku"]-1)
         self._load_ayat_range()
         self._load_ayat_box()
+        # The settings are updated in database
+        self._update_settings()
 
     def _sura_selected(self) -> None:
-        """It loads the ruku combo box and the ayat box
+        """It loads the ruku combo box and the ayat box.
         """
         self._load_ruku_list()
         self._load_ayat_range()
         self._load_ayat_box()
-
+        self._update_settings()
+        
     def _ruku_selected(self) -> None:
-        """It loads the ruku combo box and the ayat box
+        """It loads the ruku combo box and the ayat box.
         """
         self._load_ayat_range()
         self._load_ayat_box()
+        self._update_settings()
 
+    def _load_settings(self) -> None:
+        """Loads the current settings from database.
+        """
+
+        # The translate function
+        _translate = QtCore.QCoreApplication.translate
+
+        # The sql query
+        sql = "SELECT language, row_id FROM `ic_quranic_settings`"            
+        # The settings data is fetched
+        rows = self.api._fetch_data(sql, [], 2)
+        # The language settings value
+        self.lang = rows[0][0]
+        # The row id
+        row_id = rows[0][1]
+        # The row values are fetched
+        row  = self.api.get_row(row_id)
+        # The sura value is set
+        self.settings = row[0]
+        # The language is set in the qapi object
+        self.api.set_lang(self.lang)
+        
+
+    def _update_settings(self) -> None:
+        """It saves the current settings to database.
+        """
+        
+        # The current selection is fetched
+        sel = self._get_current_selection()
+        # The settings are updated in database
+        self.api.update_settings(self.lang, sel["sura"], sel["start"])
+        
     def _get_current_selection(self) -> None:
         """It returns the currently selected sura and ruku.
 
         It also returns the start and end ayat numbers. The sura data includes
-        the sura short name and number
+        the sura short name and number.
 
         :return: The selected sura, ruku and ayat numbers.
         :rtype: dict.        
@@ -528,7 +577,7 @@ class Ui_Manager():
         self.MainWindow.rukuComboBox.clear()
         # If the sura combo box has items
         if self.MainWindow.suraComboBox.count() > 0:
-            # The sura comb box data
+            # The sura combo box data
             sura = self.MainWindow.suraComboBox.currentData()
             sura = int(sura)
         else:
@@ -541,6 +590,8 @@ class Ui_Manager():
             ruku = (str(i))
             # The ruku number is added to the combo box
             self.MainWindow.rukuComboBox.addItem(ruku, ruku)
+        # The sura value is set to the settings value
+        self.MainWindow.rukuComboBox.setCurrentIndex(self.settings[1]-1)
 
     def _load_sura_list(self) -> None:
         """It loads the sura combo box with list of suras.
@@ -559,3 +610,6 @@ class Ui_Manager():
             self.MainWindow.suraComboBox.addItem(i, count)
             # The loop counter is increased
             count += 1
+
+        # The sura value is set to the settings value
+        self.MainWindow.suraComboBox.setCurrentIndex(self.settings[0]-1)
