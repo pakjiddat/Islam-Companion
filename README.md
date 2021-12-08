@@ -64,7 +64,7 @@ The next step is to build the source code using the command: `make`. This should
 
 To generate executable files for the quran and hadith readers, we need to follow the above steps seperately for each reader. The quran and hadith reader source code in the GitHub repository, contains the sysroot specification file, **deploy/sysroot.toml**. It also includes the pyqtdeploy project files, which are: **deploy/qreader.pdf** and **deploy/hreader.pdt**. Each reader has its own project file. The sysroot specification file is common to both readers.
 
-In order to run the executable files we need to download the [data files](https://drive.google.com/file/d/1TdD4jsCmqvN4y1gGR4IeVR1JGOdj_56n/view?usp=sharing) to the **/usr/local/share/islamcompanion** folder. This folder should contain a fonts sub folder and the quran and hadith sqlite database files. It also contains an icon file and desktop launcher files.
+In order to run the executable files we need to download the [data files](https://drive.google.com/file/d/1NMHSFYVgTPDGI43vrnuZShmhUPisktkN/view?usp=sharing) to the **/usr/local/share/islamcompanion** folder. This folder should contain a fonts sub folder and the quran and hadith sqlite database files. It also contains an icon file and desktop launcher files.
 
 It should now be possible to run the quran and hadith applications.
 
