@@ -383,10 +383,7 @@ class Ui_Manager():
     def _load_settings(self) -> None:
         """Loads the current settings from database.
         """
-
-        # The translate function
-        _translate = QtCore.QCoreApplication.translate
-
+        
         # The sql query
         sql = "SELECT language, row_id FROM `ic_quranic_settings`"            
         # The settings data is fetched
@@ -397,7 +394,7 @@ class Ui_Manager():
         row_id = rows[0][1]
         # The row values are fetched
         row  = self.api.get_row(row_id)
-        # The sura value is set
+        # The row values are set
         self.settings = row[0]
         # The language is set in the qapi object
         self.api.set_lang(self.lang)

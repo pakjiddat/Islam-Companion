@@ -35,7 +35,7 @@ class QuranApi(Api):
     update_settings()
         Updates the current settings in database.
     get_row()
-        Gets the field values for the given row
+        Gets the field values for the given row.
     """
 
     def __init__(self, db_path: str, default_lang: str) -> None:
@@ -294,7 +294,7 @@ class QuranApi(Api):
         :param row_id: The row id.
         :type row_id: int.                    
         :return: The field values for the given row.
-        :rtype: dict.    
+        :rtype: list.    
         """
 
         # The bind values for the sql query

@@ -20,6 +20,10 @@ class HadithApi(Api):
         source from database.
     get_hadith_text()
         Fetches the hadith text for the given source and book.
+    update_settings()
+        Updates the current settings in database.
+    get_row()
+        Gets the field values for the given row.
     """
     
     def __init__(self, db_path: str, default_lang: str) -> None:
@@ -151,3 +155,52 @@ class HadithApi(Api):
         hadith_text = rows[0][0]
 
         return hadith_text
+
+    def update_settings(self, lang: str, row_id: int) -> None:
+        """Updates the current settings in database.
+        
+        :param row_id: The current row id.
+        :type row_id: int.        
+        """
+
+        # The bind values for the query
+        bind_values = [lang, row_id]
+        sql = "UPDATE ic_hadith_settings SET language=?, row_id=?"
+        self._update_data(sql, bind_values)
+
+    def get_row(self, row_id: int) -> dict:
+        """It returns the field values for the given row.
+
+        :param row_id: The row id.
+        :type row_id: int.                    
+        :return: The field values for the given row.
+        :rtype: dict.    
+        """
+
+        # The bind values for the sql query
+        args = [row_id]
+        # The sql query
+        sql = "SELECT book_id, title FROM `" + self.tbl_text + "`"
+        sql += " WHERE id=?"        
+        # The required data is fetched
+        rows = self._fetch_data(sql, args, 2)
+        # The book id
+        book_id = rows[0][0]
+        # The title
+        title = rows[0][1]
+
+        # The bind values for the sql query
+        args = [book_id]
+        # The sql query
+        sql = "SELECT book, source FROM `" + self.tbl_books + "`"
+        sql += " WHERE id=?"        
+        # The required data is fetched
+        rows = self._fetch_data(sql, args, 2)
+        # The source
+        book = rows[0][0]
+        # The book
+        source = rows[0][1]
+
+        data = {"title": title, "source": source, "book": book}
+
+        return data

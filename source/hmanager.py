@@ -15,7 +15,7 @@ class Ui_Manager():
     initialize_ui()
         Loads the source, book and title combo boxes and the hadith text.
     
-     _update_btn_icon()
+    _update_btn_icon()
         Updates the path to the random icon to an absolute path.       
     _update_layout()
         Updates the layout of the hadith reader so it supports the current
@@ -47,6 +47,10 @@ class Ui_Manager():
     _load_title_list()
         It loads the title combo box with list of titles for the selected
         hadith source and book.
+    _update_settings()
+        It saves the current settings to database.
+    _load_settings()
+        It loads the current settings from database.    
     """
 
     def initialize_ui(self, MainWindow: QtWidgets.QMainWindow) -> None:
@@ -70,11 +74,15 @@ class Ui_Manager():
         self.config   = hconfig.get_config()    
         # The current language
         self.lang     = self.config["default_lang"]
-        # Creates an instance of the QuranApi class
+        # Creates an instance of the HadithApi class
         self.api = HadithApi(self.config["db_path"], self.lang)
+        # Loads settings from database
+        self._load_settings()
         # The main window object is set as obj attribute
         self.MainWindow = MainWindow
         
+        # The layout is updated for the new language
+        self._update_layout()
         # Connects the source combo box to a call back
         self.MainWindow.sourceComboBox.activated.connect(self._source_selected)
         # Connects the book combo box to a call back
@@ -126,10 +134,14 @@ class Ui_Manager():
         
         The position of the combo boxes, labels and buttons is updated. The
         locale and alignment of the combo boxes is also updated.  
+
+        The current language in the language menu is checked 
         """
 
         # If the current language is "English"
         if self.lang == "English":
+            # The English option is selected
+            self.MainWindow.actionEnglish.setChecked(True)
             # The position of the combo boxes is updated
             self.MainWindow.gridLayout.addWidget(
                 self.MainWindow.bookComboBox, 5, 1, 1, 1)
@@ -185,6 +197,11 @@ class Ui_Manager():
             self.MainWindow.hadithText.setFont(font)
             
         else:
+            # If the language is Urdu
+            if self.lang == "Urdu":
+                self.MainWindow.actionUrdu.setChecked(True)
+            else:
+                self.MainWindow.actionArabic.setChecked(True)
             # The position of the combo boxes is updated
             self.MainWindow.gridLayout.addWidget(
                 self.MainWindow.bookComboBox, 5, 9, 1, 1)
@@ -291,6 +308,8 @@ class Ui_Manager():
         self._load_title_list()
         # Loads the hadith box with text
         self._load_hadith_box()
+         # The settings are updated in database
+        self._update_settings()
         
     def _next_btn_handler(self) -> None:
         """Even handler for the next button.
@@ -305,7 +324,9 @@ class Ui_Manager():
             self._prev_hadith()
         else:
             # The _next_hadith method is called
-            self._next_hadith()            
+            self._next_hadith()    
+         # The settings are updated in database
+        self._update_settings()        
             
     def _prev_btn_handler(self) -> None:
         """Even handler for the prev button.
@@ -320,7 +341,9 @@ class Ui_Manager():
             self._next_hadith()
         else:
             # The _prev_hadith method is called
-            self._prev_hadith()  
+            self._prev_hadith()
+         # The settings are updated in database
+        self._update_settings()  
                     
     def _rand_hadith(self) -> None:
         """Loads a random hadith in the hadith box.
@@ -356,6 +379,8 @@ class Ui_Manager():
         
         # The hadith text box is loaded
         self._load_hadith_box()
+         # The settings are updated in database
+        self._update_settings()
                             
     def _next_hadith(self) -> None:
         """Loads the next hadith.
@@ -471,7 +496,9 @@ class Ui_Manager():
         # The title combo box is loaded
         self._load_title_list()
         # The hadith text box is loaded
-        self._load_hadith_box()   
+        self._load_hadith_box()
+         # The settings are updated in database
+        self._update_settings()   
         
     def _book_selected(self) -> None:
         """It loads the title combo box and the hadith box.
@@ -481,14 +508,14 @@ class Ui_Manager():
         self._load_title_list()
         # The hadith text box is loaded
         self._load_hadith_box()
+         # The settings are updated in database
+        self._update_settings()
         
-    def _get_current_selection(self) -> None:
+    def _get_current_selection(self) -> dict:
         """It returns the currently selected source, book and title.
         
-        Returns
-        -------
-        selection
-            The selected source, book and title
+        :return: The selected source, book and title.
+        :rtype: dict.            
         """
         
         # If the source combo box contains items
@@ -549,6 +576,8 @@ class Ui_Manager():
         text += "</div>"
         # The hadith text html is set
         self.MainWindow.hadithText.setHtml(text)
+        # The settings are updated in database
+        self._update_settings()
                 
     def _load_source_list(self) -> None:
         """It loads the source combo box with list of sources.
@@ -570,6 +599,8 @@ class Ui_Manager():
             self.MainWindow.sourceComboBox.addItem(i, count)
             # The loop counter is increased by 1
             count += 1
+        # The title value is set to the settings value
+        self.MainWindow.sourceComboBox.setCurrentText(self.settings["source"])
             
     def _load_book_list(self) -> None:
         """It loads the book combo box with list of books.
@@ -591,6 +622,9 @@ class Ui_Manager():
         for book in book_list:
             # The book is added to the book combo box
             self.MainWindow.bookComboBox.addItem(book[1], str(book[0]))
+
+        # The book value is set to the settings value
+        self.MainWindow.bookComboBox.setCurrentText(self.settings["book"])
             
     def _load_title_list(self) -> None:
         """It loads the title combo box with list of titles for the selected
@@ -607,3 +641,32 @@ class Ui_Manager():
         for title in title_list:
             # The title is added to the title combo box
             self.MainWindow.titleComboBox.addItem(title[1], str(title[0]))
+        # The title value is set to the settings value
+        self.MainWindow.titleComboBox.setCurrentText(self.settings["title"])
+
+    def _load_settings(self) -> None:
+        """Loads the current settings from database.
+        """
+
+        # The sql query
+        sql = "SELECT language, row_id FROM `ic_hadith_settings`"            
+        # The settings data is fetched
+        rows = self.api._fetch_data(sql, [], 2)        
+        # The language settings value
+        self.lang = rows[0][0]
+        # The row id
+        row_id = rows[0][1]
+        # The language is set in the hapi object
+        self.api.set_lang(self.lang)
+        # The row values are fetched
+        self.settings = self.api.get_row(row_id)                
+        
+
+    def _update_settings(self) -> None:
+        """It saves the current settings to database.
+        """
+        
+        # The current selection is fetched
+        sel = self._get_current_selection()  
+        # The settings are updated in database
+        self.api.update_settings(self.lang, sel["title"])
